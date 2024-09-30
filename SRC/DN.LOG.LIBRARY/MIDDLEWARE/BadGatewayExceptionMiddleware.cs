@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
+﻿using DN.LOG.LIBRARY.MODEL;
 using DN.LOG.LIBRARY.MODEL.ENUM;
-using DN.LOG.LIBRARY.MODEL.EXCEPTION;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using System.Net;
-using DN.LOG.LIBRARY.MODEL;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
@@ -15,7 +14,22 @@ public class BadGatewayExceptionMiddleware(RequestDelegate requestDelegate) : Ba
         {
             await _requestDelegate(httpContext);
         }
-        catch (BadGatewayException ex)
+        catch (TaskCanceledException ex) when(ex.InnerException is TimeoutException)
+        {
+            LogExtension.CreateLog(new LogObject(
+            Guid.NewGuid().ToString(),
+            "DN",
+            ex.ToString(),
+            EnumLogLevel.Error,
+            DateTime.Now,
+            httpContext.Connection.RemoteIpAddress,
+            HttpStatusCode.GatewayTimeout));
+
+            httpContext.Response.StatusCode = (int)HttpStatusCode.GatewayTimeout;
+
+            await httpContext.Response.WriteAsync(string.Empty);
+        }
+        catch (HttpRequestException ex)
         {
             LogExtension.CreateLog(new LogObject(
             Guid.NewGuid().ToString(),

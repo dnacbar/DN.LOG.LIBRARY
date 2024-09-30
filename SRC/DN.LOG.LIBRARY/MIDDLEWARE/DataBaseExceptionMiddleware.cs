@@ -1,22 +1,31 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
+﻿using DN.LOG.LIBRARY.MODEL;
 using DN.LOG.LIBRARY.MODEL.ENUM;
-using DN.LOG.LIBRARY.MODEL.EXCEPTION;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using System.Data.SqlClient;
 using System.Net;
-using DN.LOG.LIBRARY.MODEL;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
 public class DataBaseExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
 {
+    private const int SQL_TIMEOUT = -2;
+
     public override async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
             await _requestDelegate(httpContext);
         }
-        catch (DataBaseException ex)
+        catch (SqlException ex)
         {
+            HttpStatusCode httpStatusCode;
+
+            if (ex.Number == SQL_TIMEOUT)
+                httpStatusCode = HttpStatusCode.RequestTimeout;
+            else 
+                httpStatusCode = HttpStatusCode.BadRequest;
+
             LogExtension.CreateLog(new LogObject(
             Guid.NewGuid().ToString(),
             "DN",
@@ -24,9 +33,9 @@ public class DataBaseExceptionMiddleware(RequestDelegate requestDelegate) : Base
             EnumLogLevel.Error,
             DateTime.Now,
             httpContext.Connection.RemoteIpAddress,
-            HttpStatusCode.BadRequest));
+            httpStatusCode));
 
-            httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            httpContext.Response.StatusCode = (int)httpStatusCode;
 
             await httpContext.Response.WriteAsync(string.Empty);
         }

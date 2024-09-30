@@ -12,7 +12,6 @@ public sealed class FatalExceptionMiddleware(RequestDelegate requestDelegate) : 
     {
         try
         {
-            //throw new Exception("Internal Server Error!");
             await _requestDelegate(httpContext);
         }
         catch (Exception ex)

@@ -13,7 +13,6 @@ public class NotFoundExceptionMiddleware(RequestDelegate requestDelegate) : Base
     {
         try
         {
-            //throw new NotFoundException("");
             await _requestDelegate(httpContext);
         }
         catch (NotFoundException ex)
