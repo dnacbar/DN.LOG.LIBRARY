@@ -2,9 +2,8 @@
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-public abstract class BaseMiddleware(RequestDelegate requestDelegate)
+internal abstract class BaseMiddleware(RequestDelegate requestDelegate)
 {
     protected readonly RequestDelegate _requestDelegate = requestDelegate ?? throw new ArgumentNullException(nameof(requestDelegate));
-
-    public abstract Task InvokeAsync(HttpContext httpContext);
+    protected abstract Task InvokeAsync(HttpContext httpContext);
 }

@@ -7,11 +7,11 @@ using System.Net;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-public class DataBaseExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
+internal sealed class DataBaseExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
 {
     private const int SQL_TIMEOUT = -2;
 
-    public override async Task InvokeAsync(HttpContext httpContext)
+    protected override async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
@@ -23,17 +23,10 @@ public class DataBaseExceptionMiddleware(RequestDelegate requestDelegate) : Base
 
             if (ex.Number == SQL_TIMEOUT)
                 httpStatusCode = HttpStatusCode.RequestTimeout;
-            else 
+            else
                 httpStatusCode = HttpStatusCode.BadRequest;
 
-            LogExtension.CreateLog(new LogObject(
-            Guid.NewGuid().ToString(),
-            "DN",
-            ex.ToString(),
-            EnumLogLevel.Error,
-            DateTime.Now,
-            httpContext.Connection.RemoteIpAddress,
-            httpStatusCode));
+            ex.CreateLog(EnumLogLevel.Error, httpContext.Connection.RemoteIpAddress, httpStatusCode);
 
             httpContext.Response.StatusCode = (int)httpStatusCode;
 

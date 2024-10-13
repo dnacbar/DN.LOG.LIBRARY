@@ -6,24 +6,17 @@ using System.Net;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-public class BadGatewayExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
+internal sealed class BadGatewayExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
 {
-    public override async Task InvokeAsync(HttpContext httpContext)
+    protected override async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
             await _requestDelegate(httpContext);
         }
-        catch (TaskCanceledException ex) when(ex.InnerException is TimeoutException)
+        catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
         {
-            LogExtension.CreateLog(new LogObject(
-            Guid.NewGuid().ToString(),
-            "DN",
-            ex.ToString(),
-            EnumLogLevel.Error,
-            DateTime.Now,
-            httpContext.Connection.RemoteIpAddress,
-            HttpStatusCode.GatewayTimeout));
+            ex.CreateLog(EnumLogLevel.Error, httpContext.Connection.RemoteIpAddress, HttpStatusCode.GatewayTimeout);
 
             httpContext.Response.StatusCode = (int)HttpStatusCode.GatewayTimeout;
 
@@ -31,14 +24,7 @@ public class BadGatewayExceptionMiddleware(RequestDelegate requestDelegate) : Ba
         }
         catch (HttpRequestException ex)
         {
-            LogExtension.CreateLog(new LogObject(
-            Guid.NewGuid().ToString(),
-            "DN",
-            ex.ToString(),
-            EnumLogLevel.Error,
-            DateTime.Now,
-            httpContext.Connection.RemoteIpAddress,
-            HttpStatusCode.BadGateway));
+            ex.CreateLog(EnumLogLevel.Error, httpContext.Connection.RemoteIpAddress, HttpStatusCode.BadGateway);
 
             httpContext.Response.StatusCode = (int)HttpStatusCode.BadGateway;
 

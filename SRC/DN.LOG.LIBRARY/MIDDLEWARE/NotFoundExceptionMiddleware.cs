@@ -7,9 +7,9 @@ using DN.LOG.LIBRARY.MODEL;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-public class NotFoundExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
+internal sealed class NotFoundExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
 {
-    public override async Task InvokeAsync(HttpContext httpContext)
+    protected override async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
@@ -17,14 +17,7 @@ public class NotFoundExceptionMiddleware(RequestDelegate requestDelegate) : Base
         }
         catch (NotFoundException ex)
         {
-            LogExtension.CreateLog(new LogObject
-            (Guid.NewGuid().ToString(), 
-            "DN", 
-            ex.ToString(), 
-            EnumLogLevel.Warning, 
-            DateTime.Now, 
-            httpContext.Connection.RemoteIpAddress,
-            HttpStatusCode.NotFound));
+            ex.CreateLog(EnumLogLevel.Warning, httpContext.Connection.RemoteIpAddress, HttpStatusCode.NotFound);
 
             httpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
 

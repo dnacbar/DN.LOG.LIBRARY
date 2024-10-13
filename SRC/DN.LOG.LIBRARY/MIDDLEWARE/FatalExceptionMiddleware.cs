@@ -6,9 +6,9 @@ using DN.LOG.LIBRARY.MODEL;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-public sealed class FatalExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
+internal sealed class FatalExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
 {
-    public override async Task InvokeAsync(HttpContext httpContext)
+    protected override async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
@@ -16,14 +16,7 @@ public sealed class FatalExceptionMiddleware(RequestDelegate requestDelegate) : 
         }
         catch (Exception ex)
         {
-            LogExtension.CreateLog(new LogObject(
-            Guid.NewGuid().ToString(),
-            "DN",
-            ex.ToString(),
-            EnumLogLevel.Fatal,
-            DateTime.Now,
-            httpContext.Connection.RemoteIpAddress,
-            HttpStatusCode.InternalServerError));
+            ex.CreateLog(EnumLogLevel.Fatal, httpContext.Connection.RemoteIpAddress, HttpStatusCode.InternalServerError);
 
             httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 

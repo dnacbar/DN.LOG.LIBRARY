@@ -7,9 +7,9 @@ using DN.LOG.LIBRARY.MODEL;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-public class BadRequestExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
+internal sealed class BadRequestExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
 {
-    public override async Task InvokeAsync(HttpContext httpContext)
+    protected override async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
@@ -17,14 +17,7 @@ public class BadRequestExceptionMiddleware(RequestDelegate requestDelegate) : Ba
         }
         catch (BadRequestException ex)
         {
-            LogExtension.CreateLog(new LogObject
-            (Guid.NewGuid().ToString(),
-            "DN",
-            ex.ToString(),
-            EnumLogLevel.Warning,
-            DateTime.Now,
-            httpContext.Connection.RemoteIpAddress,
-            HttpStatusCode.BadRequest));
+            ex.CreateLog(EnumLogLevel.Warning, httpContext.Connection.RemoteIpAddress, HttpStatusCode.BadRequest);
 
             httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
