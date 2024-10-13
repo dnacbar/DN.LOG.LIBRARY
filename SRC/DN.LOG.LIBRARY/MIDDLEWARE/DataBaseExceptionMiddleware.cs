@@ -2,12 +2,13 @@
 using DN.LOG.LIBRARY.MODEL.ENUM;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System.Data.SqlClient;
 using System.Net;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-internal sealed class DataBaseExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
+internal sealed class DataBaseExceptionMiddleware(ILogger<DataBaseExceptionMiddleware> logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
     private const int SQL_TIMEOUT = -2;
 
@@ -26,7 +27,7 @@ internal sealed class DataBaseExceptionMiddleware(RequestDelegate requestDelegat
             else
                 httpStatusCode = HttpStatusCode.BadRequest;
 
-            ex.CreateLog(EnumLogLevel.Error, httpContext.Connection.RemoteIpAddress, httpStatusCode);
+            ex.CreateLog(_logger, EnumLogLevel.Error, httpContext.Connection.RemoteIpAddress);
 
             httpContext.Response.StatusCode = (int)httpStatusCode;
 

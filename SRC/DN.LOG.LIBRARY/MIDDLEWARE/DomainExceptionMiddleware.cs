@@ -4,10 +4,11 @@ using DN.LOG.LIBRARY.MODEL;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Logging;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-internal sealed class DomainExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
+internal sealed class DomainExceptionMiddleware(ILogger<DomainExceptionMiddleware> logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
     protected override async Task InvokeAsync(HttpContext httpContext)
     {
@@ -17,7 +18,7 @@ internal sealed class DomainExceptionMiddleware(RequestDelegate requestDelegate)
         }
         catch (DomainException ex)
         {
-            ex.CreateLog(EnumLogLevel.Error, httpContext.Connection.RemoteIpAddress, HttpStatusCode.BadRequest);
+            ex.CreateLog(_logger, EnumLogLevel.Error, httpContext.Connection.RemoteIpAddress);
 
             httpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
 

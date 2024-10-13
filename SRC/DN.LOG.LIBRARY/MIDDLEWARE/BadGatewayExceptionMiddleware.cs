@@ -2,11 +2,12 @@
 using DN.LOG.LIBRARY.MODEL.ENUM;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System.Net;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-internal sealed class BadGatewayExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
+internal sealed class BadGatewayExceptionMiddleware(ILogger<BadGatewayExceptionMiddleware> logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
     protected override async Task InvokeAsync(HttpContext httpContext)
     {
@@ -16,7 +17,7 @@ internal sealed class BadGatewayExceptionMiddleware(RequestDelegate requestDeleg
         }
         catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
         {
-            ex.CreateLog(EnumLogLevel.Error, httpContext.Connection.RemoteIpAddress, HttpStatusCode.GatewayTimeout);
+            ex.CreateLog(_logger, EnumLogLevel.Error, httpContext.Connection.RemoteIpAddress);
 
             httpContext.Response.StatusCode = (int)HttpStatusCode.GatewayTimeout;
 
@@ -24,7 +25,7 @@ internal sealed class BadGatewayExceptionMiddleware(RequestDelegate requestDeleg
         }
         catch (HttpRequestException ex)
         {
-            ex.CreateLog(EnumLogLevel.Error, httpContext.Connection.RemoteIpAddress, HttpStatusCode.BadGateway);
+            ex.CreateLog(_logger, EnumLogLevel.Error, httpContext.Connection.RemoteIpAddress);
 
             httpContext.Response.StatusCode = (int)HttpStatusCode.BadGateway;
 

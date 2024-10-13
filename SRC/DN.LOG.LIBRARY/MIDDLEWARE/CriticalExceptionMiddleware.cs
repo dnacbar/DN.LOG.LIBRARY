@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Http;
 using DN.LOG.LIBRARY.MODEL.ENUM;
 using System.Net;
 using DN.LOG.LIBRARY.MODEL;
+using Microsoft.Extensions.Logging;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-internal sealed class FatalExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
+internal sealed class CriticalExceptionMiddleware(ILogger<CriticalExceptionMiddleware> logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
     protected override async Task InvokeAsync(HttpContext httpContext)
     {
@@ -16,7 +17,7 @@ internal sealed class FatalExceptionMiddleware(RequestDelegate requestDelegate) 
         }
         catch (Exception ex)
         {
-            ex.CreateLog(EnumLogLevel.Fatal, httpContext.Connection.RemoteIpAddress, HttpStatusCode.InternalServerError);
+            ex.CreateLog(_logger, EnumLogLevel.Critical, httpContext.Connection.RemoteIpAddress);
 
             httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
@@ -25,10 +26,10 @@ internal sealed class FatalExceptionMiddleware(RequestDelegate requestDelegate) 
     }
 }
 
-public static class FatalExceptionMiddlewareExtension
+public static class CriticalExceptionMiddlewareExtension
 {
     public static IApplicationBuilder UseFatalExceptionMiddleware(this IApplicationBuilder builder)
     {
-        return builder.UseMiddleware<FatalExceptionMiddleware>();
+        return builder.UseMiddleware<CriticalExceptionMiddleware>();
     }
 }

@@ -4,10 +4,11 @@ using DN.LOG.LIBRARY.MODEL.ENUM;
 using DN.LOG.LIBRARY.MODEL.EXCEPTION;
 using System.Net;
 using DN.LOG.LIBRARY.MODEL;
+using Microsoft.Extensions.Logging;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-internal sealed class NotFoundExceptionMiddleware(RequestDelegate requestDelegate) : BaseMiddleware(requestDelegate)
+internal sealed class NotFoundExceptionMiddleware(ILogger<NotFoundExceptionMiddleware> logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
     protected override async Task InvokeAsync(HttpContext httpContext)
     {
@@ -17,7 +18,7 @@ internal sealed class NotFoundExceptionMiddleware(RequestDelegate requestDelegat
         }
         catch (NotFoundException ex)
         {
-            ex.CreateLog(EnumLogLevel.Warning, httpContext.Connection.RemoteIpAddress, HttpStatusCode.NotFound);
+            ex.CreateLog(_logger, EnumLogLevel.Warning, httpContext.Connection.RemoteIpAddress);
 
             httpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
 
