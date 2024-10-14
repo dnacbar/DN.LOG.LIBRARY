@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Data.SqlClient;
 using System.Linq;
@@ -28,7 +29,7 @@ public class LogMiddlewareTest
                 .ConfigureServices(x => { })
                 .Configure(app =>
                 {
-                    app.UseFatalExceptionMiddleware();
+                    app.UseCriticalExceptionMiddleware();
                     app.Run(context => throw new Exception("TESTE QUE DEU MUITO ERRADO!"));
                 });
         })
@@ -106,7 +107,9 @@ public class LogMiddlewareTest
                 .ConfigureServices(x => { })
                 .Configure(app =>
                 {
-                    app.UseBadGatewayExceptionMiddleware();
+                    var factory = LoggerFactory.Create(x => { });
+
+                    app.UseBadGatewayExceptionMiddleware(factory.CreateLogger(""));
                     app.Run(context => throw new HttpRequestException("ERRO AO EXECUTAR A CHAMADA HTTP!"));
                 });
         })

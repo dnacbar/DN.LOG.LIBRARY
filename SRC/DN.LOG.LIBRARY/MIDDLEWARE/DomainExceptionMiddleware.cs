@@ -8,9 +8,9 @@ using Microsoft.Extensions.Logging;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-internal sealed class DomainExceptionMiddleware(ILogger<DomainExceptionMiddleware> logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
+public sealed class DomainExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
-    protected override async Task InvokeAsync(HttpContext httpContext)
+    public override async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
@@ -29,8 +29,8 @@ internal sealed class DomainExceptionMiddleware(ILogger<DomainExceptionMiddlewar
 
 public static class DomainExceptionMiddlewareExtension
 {
-    public static IApplicationBuilder UseDomainExceptionMiddleware(this IApplicationBuilder builder)
+    public static IApplicationBuilder UseDomainExceptionMiddleware(this IApplicationBuilder builder, ILogger logger)
     {
-        return builder.UseMiddleware<DomainExceptionMiddleware>();
+        return builder.UseMiddleware<DomainExceptionMiddleware>(logger);
     }
 }

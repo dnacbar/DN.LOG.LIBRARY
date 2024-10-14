@@ -10,7 +10,7 @@ public static class LogObjectExtension
     {
         var logMessage = @"ID: " + Guid.NewGuid() +
                         " DATETIME: " + DateTime.Now.ToString() +
-                        "IP: " + iPAddress?.MapToIPv4().ToString() + Environment.NewLine +
+                        " IP: " + iPAddress?.MapToIPv4().ToString() + Environment.NewLine +
                         "LOG: " + ex.ToString();
 
         switch (levelLog)

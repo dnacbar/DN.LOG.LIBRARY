@@ -8,11 +8,11 @@ using System.Net;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-internal sealed class DataBaseExceptionMiddleware(ILogger<DataBaseExceptionMiddleware> logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
+public sealed class DataBaseExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
     private const int SQL_TIMEOUT = -2;
 
-    protected override async Task InvokeAsync(HttpContext httpContext)
+    public override async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
@@ -38,8 +38,8 @@ internal sealed class DataBaseExceptionMiddleware(ILogger<DataBaseExceptionMiddl
 
 public static class DataBaseExceptionMiddlewareExtension
 {
-    public static IApplicationBuilder UseDataBaseExceptionMiddleware(this IApplicationBuilder builder)
+    public static IApplicationBuilder UseDataBaseExceptionMiddleware(this IApplicationBuilder builder, ILogger logger)
     {
-        return builder.UseMiddleware<DataBaseExceptionMiddleware>();
+        return builder.UseMiddleware<DataBaseExceptionMiddleware>(logger);
     }
 }

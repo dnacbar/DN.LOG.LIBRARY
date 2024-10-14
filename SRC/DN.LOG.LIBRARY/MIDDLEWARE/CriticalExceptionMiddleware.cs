@@ -7,9 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-internal sealed class CriticalExceptionMiddleware(ILogger<CriticalExceptionMiddleware> logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
+public sealed class CriticalExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
-    protected override async Task InvokeAsync(HttpContext httpContext)
+    public override async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
@@ -28,8 +28,8 @@ internal sealed class CriticalExceptionMiddleware(ILogger<CriticalExceptionMiddl
 
 public static class CriticalExceptionMiddlewareExtension
 {
-    public static IApplicationBuilder UseFatalExceptionMiddleware(this IApplicationBuilder builder)
+    public static IApplicationBuilder UseCriticalExceptionMiddleware(this IApplicationBuilder builder, ILogger logger)
     {
-        return builder.UseMiddleware<CriticalExceptionMiddleware>();
+        return builder.UseMiddleware<CriticalExceptionMiddleware>(logger);
     }
 }

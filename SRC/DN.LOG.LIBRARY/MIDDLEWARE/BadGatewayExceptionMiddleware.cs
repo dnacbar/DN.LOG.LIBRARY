@@ -7,9 +7,9 @@ using System.Net;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-internal sealed class BadGatewayExceptionMiddleware(ILogger<BadGatewayExceptionMiddleware> logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
+public sealed class BadGatewayExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
-    protected override async Task InvokeAsync(HttpContext httpContext)
+    public override async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
@@ -36,8 +36,8 @@ internal sealed class BadGatewayExceptionMiddleware(ILogger<BadGatewayExceptionM
 
 public static class BadGatewayExceptionMiddlewareExtension
 {
-    public static IApplicationBuilder UseBadGatewayExceptionMiddleware(this IApplicationBuilder builder)
+    public static IApplicationBuilder UseBadGatewayExceptionMiddleware(this IApplicationBuilder builder, ILogger logger)
     {
-        return builder.UseMiddleware<BadGatewayExceptionMiddleware>();
+        return builder.UseMiddleware<BadGatewayExceptionMiddleware>(logger);
     }
 }

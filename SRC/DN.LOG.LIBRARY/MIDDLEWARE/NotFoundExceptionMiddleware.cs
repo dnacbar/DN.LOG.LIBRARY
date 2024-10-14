@@ -8,9 +8,9 @@ using Microsoft.Extensions.Logging;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-internal sealed class NotFoundExceptionMiddleware(ILogger<NotFoundExceptionMiddleware> logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
+public sealed class NotFoundExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
-    protected override async Task InvokeAsync(HttpContext httpContext)
+    public override async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
@@ -29,8 +29,8 @@ internal sealed class NotFoundExceptionMiddleware(ILogger<NotFoundExceptionMiddl
 
 public static class NotFoundExceptionMiddlewareExtension
 {
-    public static IApplicationBuilder UseNotFoundExceptionMiddleware(this IApplicationBuilder builder)
+    public static IApplicationBuilder UseNotFoundExceptionMiddleware(this IApplicationBuilder builder, ILogger logger)
     {
-        return builder.UseMiddleware<NotFoundExceptionMiddleware>();
+        return builder.UseMiddleware<NotFoundExceptionMiddleware>(logger);
     }
 }

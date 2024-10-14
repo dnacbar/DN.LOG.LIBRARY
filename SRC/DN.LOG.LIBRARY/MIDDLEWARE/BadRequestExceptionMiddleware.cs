@@ -8,9 +8,9 @@ using Microsoft.Extensions.Logging;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-internal sealed class BadRequestExceptionMiddleware(ILogger<BadGatewayExceptionMiddleware> logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
+public sealed class BadRequestExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
-    protected override async Task InvokeAsync(HttpContext httpContext)
+    public override async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
@@ -29,8 +29,8 @@ internal sealed class BadRequestExceptionMiddleware(ILogger<BadGatewayExceptionM
 
 public static class BadRequestExceptionMiddlewareExtension
 {
-    public static IApplicationBuilder UseBadRequestExceptionMiddleware(this IApplicationBuilder builder)
+    public static IApplicationBuilder UseBadRequestExceptionMiddleware(this IApplicationBuilder builder, ILogger logger)
     {
-        return builder.UseMiddleware<BadRequestExceptionMiddleware>();
+        return builder.UseMiddleware<BadRequestExceptionMiddleware>(logger);
     }
 }
