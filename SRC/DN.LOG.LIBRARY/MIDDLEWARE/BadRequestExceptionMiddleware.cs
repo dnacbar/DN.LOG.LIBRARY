@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-public sealed class BadRequestExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
+internal sealed class BadRequestExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
     public override async Task InvokeAsync(HttpContext httpContext)
     {

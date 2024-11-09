@@ -7,7 +7,7 @@ using System.Net;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-public sealed class BadGatewayExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
+internal sealed class BadGatewayExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
     public override async Task InvokeAsync(HttpContext httpContext)
     {

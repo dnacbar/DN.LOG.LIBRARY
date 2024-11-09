@@ -8,7 +8,7 @@ using System.Net;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-public sealed class DataBaseExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
+internal sealed class DataBaseExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
     private const int SQL_TIMEOUT = -2;
 

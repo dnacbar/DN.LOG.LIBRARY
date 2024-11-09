@@ -6,7 +6,7 @@ namespace DN.LOG.LIBRARY.MODEL;
 
 public static class LogObjectExtension
 {
-    public static void CreateLog(this Exception ex, ILogger logger, EnumLogLevel levelLog, IPAddress iPAddress = null)
+    public static void CreateLog(this Exception ex, ILogger logger, EnumLogLevel levelLog, IPAddress iPAddress)
     {
         var logMessage = @"ID: " + Guid.NewGuid() +
                         " DATETIME: " + DateTime.Now.ToString() +

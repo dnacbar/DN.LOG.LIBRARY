@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
-public sealed class CriticalExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
+internal sealed class CriticalExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
     public override async Task InvokeAsync(HttpContext httpContext)
     {

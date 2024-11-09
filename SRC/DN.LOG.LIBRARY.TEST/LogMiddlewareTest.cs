@@ -13,13 +13,15 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
+using Moq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DN.LOG.LIBRARY.TEST;
 
 public class LogMiddlewareTest
 {
     [Fact]
-    public async Task TestFatalMiddleware()
+    public async Task TestCriticalMiddleware()
     {
         using var host = await new HostBuilder()
         .ConfigureWebHost(webBuilder =>
@@ -29,7 +31,7 @@ public class LogMiddlewareTest
                 .ConfigureServices(x => { })
                 .Configure(app =>
                 {
-                    app.UseCriticalExceptionMiddleware();
+                    app.UseCriticalExceptionMiddleware(LoggerFactory.Create(x => { }).CreateLogger(""));
                     app.Run(context => throw new Exception("TESTE QUE DEU MUITO ERRADO!"));
                 });
         })
@@ -51,7 +53,7 @@ public class LogMiddlewareTest
                 .ConfigureServices(x => { })
                 .Configure(app =>
                 {
-                    app.UseBadRequestExceptionMiddleware();
+                    app.UseBadRequestExceptionMiddleware(LoggerFactory.Create(x => { }).CreateLogger(""));
                     app.Run(context => throw new BadRequestException("ERRO AO EXECUTAR A CHAMADA HTTP!"));
                 });
         })
@@ -85,7 +87,7 @@ public class LogMiddlewareTest
                 .ConfigureServices(x => { })
                 .Configure(app =>
                 {
-                    app.UseDataBaseExceptionMiddleware();
+                    app.UseDataBaseExceptionMiddleware(LoggerFactory.Create(x => { }).CreateLogger(""));
                     app.Run(context => throw sqlException);
                 });
         })
@@ -107,9 +109,7 @@ public class LogMiddlewareTest
                 .ConfigureServices(x => { })
                 .Configure(app =>
                 {
-                    var factory = LoggerFactory.Create(x => { });
-
-                    app.UseBadGatewayExceptionMiddleware(factory.CreateLogger(""));
+                    app.UseBadGatewayExceptionMiddleware(LoggerFactory.Create(x => { }).CreateLogger(""));
                     app.Run(context => throw new HttpRequestException("ERRO AO EXECUTAR A CHAMADA HTTP!"));
                 });
         })
@@ -131,7 +131,7 @@ public class LogMiddlewareTest
                 .ConfigureServices(x => { })
                 .Configure(app =>
                 {
-                    app.UseNotFoundExceptionMiddleware();
+                    app.UseNotFoundExceptionMiddleware(LoggerFactory.Create(x => { }).CreateLogger(""));
                     app.Run(context => throw new NotFoundException("REGISTRO NÃO ENCONTRADO!"));
                 });
         })
