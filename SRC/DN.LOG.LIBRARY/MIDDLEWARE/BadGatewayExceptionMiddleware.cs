@@ -9,7 +9,7 @@ namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
 internal sealed class BadGatewayExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
-    public override async Task InvokeAsync(HttpContext httpContext)
+    internal override async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {

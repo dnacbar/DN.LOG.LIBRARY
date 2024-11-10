@@ -12,7 +12,7 @@ internal sealed class DataBaseExceptionMiddleware(ILogger logger, RequestDelegat
 {
     private const int SQL_TIMEOUT = -2;
 
-    public override async Task InvokeAsync(HttpContext httpContext)
+    internal override async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
