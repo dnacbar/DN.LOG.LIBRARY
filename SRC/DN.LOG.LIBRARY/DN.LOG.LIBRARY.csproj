@@ -3,12 +3,12 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
+		<Nullable>disable</Nullable>
 		<Platforms>x64</Platforms>
 		<PackageId>DN.LOG.LIBRARY</PackageId>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 		<FileVersion>1.0.0.0</FileVersion>
-		<Version>1.4.5</Version>
+		<Version>1.4.7</Version>
 		<OutputPath>C:\NACBAR\5_PACKAGE</OutputPath>
 	</PropertyGroup>
 
@@ -18,5 +18,5 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
 		<PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
 	</ItemGroup>
-
 </Project>
+<!-- dotnet pack -configuration Release -runtime win-x64 -output "C:\NACBAR\5_PACKAGE" -->

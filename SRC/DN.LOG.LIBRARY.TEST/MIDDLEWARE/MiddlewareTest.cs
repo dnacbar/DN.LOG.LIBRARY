@@ -16,9 +16,9 @@ using Xunit;
 using Moq;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DN.LOG.LIBRARY.TEST;
+namespace DN.LOG.LIBRARY.TEST.MIDDLEWARE;
 
-public class LogMiddlewareTest
+public class MiddlewareTest
 {
     [Fact]
     public async Task TestCriticalMiddleware()
@@ -71,13 +71,13 @@ public class LogMiddlewareTest
         .GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)
         .FirstOrDefault(c => c.GetParameters().Length == 4);
 
-        var sqlException = sqlExceptionCtor.Invoke(new object[]
-        {
+        var sqlException = sqlExceptionCtor.Invoke(
+        [
             "Simulated SQL Exception",  // Message
             null,                       // SqlErrorCollection
             null,                       // Server (null)
             Guid.NewGuid()              // ClientConnectionId
-        }) as SqlException;
+        ]) as SqlException;
 
         using var host = await new HostBuilder()
         .ConfigureWebHost(webBuilder =>

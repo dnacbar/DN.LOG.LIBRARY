@@ -7,5 +7,5 @@ internal abstract class BaseMiddleware(ILogger logger, RequestDelegate requestDe
 {
     protected readonly ILogger _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     protected readonly RequestDelegate _requestDelegate = requestDelegate ?? throw new ArgumentNullException(nameof(requestDelegate));
-    internal abstract Task InvokeAsync(HttpContext httpContext);
+    public abstract Task InvokeAsync(HttpContext httpContext);
 }

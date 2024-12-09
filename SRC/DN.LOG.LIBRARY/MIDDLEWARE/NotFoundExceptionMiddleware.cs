@@ -10,7 +10,7 @@ namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
 internal sealed class NotFoundExceptionMiddleware(ILogger logger, RequestDelegate requestDelegate) : BaseMiddleware(logger, requestDelegate)
 {
-    internal override async Task InvokeAsync(HttpContext httpContext)
+    public override async Task InvokeAsync(HttpContext httpContext)
     {
         try
         {
