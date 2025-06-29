@@ -6,12 +6,11 @@ namespace DN.LOG.LIBRARY.MODEL;
 
 public static class LogObjectExtension
 {
-    public static void CreateLog(this Exception ex, ILogger logger, EnumLogLevel levelLog, IPAddress iPAddress)
+    public static void CreateLog(this Exception ex, ILogger logger, EnumLogLevel levelLog, IPAddress iPAddress = null)
     {
-        var logMessage = @"ID: " + Guid.NewGuid() +
-                        " DATETIME: " + DateTime.Now.ToString() +
-                        " IP: " + iPAddress?.MapToIPv4().ToString() + Environment.NewLine +
-                        "LOG: " + ex.ToString();
+        var logMessage = iPAddress == null ?
+            string.Concat(@"ID: {0} DATETIME: {1}{3}LOG: {4}", Guid.NewGuid(), DateTime.Now.ToString(), Environment.NewLine, ex.ToString()) :
+            string.Concat(@"ID: {0} DATETIME: {1} IP: {2}{3}LOG: {4}", Guid.NewGuid(), DateTime.Now.ToString(), iPAddress?.MapToIPv4().ToString(), Environment.NewLine, ex.ToString());
 
         switch (levelLog)
         {

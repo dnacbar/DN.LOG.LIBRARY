@@ -3,6 +3,7 @@ using DN.LOG.LIBRARY.MODEL.EXCEPTION;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,8 +14,6 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
-using Moq;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace DN.LOG.LIBRARY.TEST.MIDDLEWARE;
 
