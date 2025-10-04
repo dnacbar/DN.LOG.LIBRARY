@@ -20,14 +20,8 @@ internal sealed class BadRequestExceptionMiddleware(ILogger logger, RequestDeleg
         catch (Exception ex) when (ex is BadRequestException || ex is ValidationException)
         {
             if (ex is ValidationException vex)
-            {
-                string mensagemValidacao = string.Empty;
-                foreach (var item in vex.Errors)
-                    mensagemValidacao += vex.Message;
-
-                ex = new BadRequestException(mensagemValidacao);
-            }
-
+                ex = new BadRequestException(string.Join(",", vex.Errors.Select(x => x.ErrorMessage)));
+            
             ex.CreateLog(_logger, EnumLogLevel.Warning, httpContext.Connection.RemoteIpAddress);
 
             httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;

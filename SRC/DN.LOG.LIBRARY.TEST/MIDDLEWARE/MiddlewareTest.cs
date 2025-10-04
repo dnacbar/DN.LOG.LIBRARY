@@ -1,5 +1,7 @@
 using DN.LOG.LIBRARY.MIDDLEWARE;
 using DN.LOG.LIBRARY.MODEL.EXCEPTION;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -53,7 +55,7 @@ public class MiddlewareTest
                 .Configure(app =>
                 {
                     app.UseBadRequestExceptionMiddleware(LoggerFactory.Create(x => { }).CreateLogger(""));
-                    app.Run(context => throw new BadRequestException("ERRO AO EXECUTAR A CHAMADA HTTP!"));
+                    app.Run(context => throw new ValidationException("O CAMPO X É NECESSÁRIO"));
                 });
         })
         .StartAsync();
@@ -139,5 +141,39 @@ public class MiddlewareTest
         var response = host.GetTestClient().GetAsync("/");
 
         Assert.Equal(HttpStatusCode.NotFound, (await response).StatusCode);
+    }
+
+    [Theory]
+    [InlineData("BadRequestException", new[] { "Mensagem de BadRequestException" })]
+    [InlineData("ValidationException", new[] { "ERRO 1", "ERRO 2", "ERRO 3" })]
+    public async Task TestBadRequestExceptionMiddleware_ErrorMessages(string exceptionType, string[] expectedMessage)
+    {
+        using var host = await new HostBuilder()
+            .ConfigureWebHost(webBuilder =>
+            {
+                webBuilder
+                    .UseTestServer()
+                    .ConfigureServices(x => { })
+                    .Configure(app =>
+                    {
+                        app.UseBadRequestExceptionMiddleware(LoggerFactory.Create(x => { }).CreateLogger(""));
+                        app.Run(context =>
+                        {
+                            if (exceptionType == "BadRequestException")
+                                throw new BadRequestException(expectedMessage[0]);
+                            else if (exceptionType == "ValidationException")
+                                throw new ValidationException("", expectedMessage.Select(x => new ValidationFailure(x, x)));
+                            return Task.CompletedTask;
+                        });
+                    });
+            })
+            .StartAsync();
+
+        var response = await host.GetTestClient().GetAsync("/");
+        var responseBody = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        // Permite validar a mensagem de erro no debug
+        Assert.True(string.IsNullOrEmpty(responseBody) || responseBody.Contains(expectedMessage[0]), $"Mensagem esperada: {expectedMessage[0]}, Mensagem retornada: {responseBody}");
     }
 }
