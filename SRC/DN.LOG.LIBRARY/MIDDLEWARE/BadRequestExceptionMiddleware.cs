@@ -5,6 +5,7 @@ using DN.LOG.LIBRARY.MODEL.EXCEPTION;
 using System.Net;
 using DN.LOG.LIBRARY.MODEL;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
 
@@ -16,8 +17,17 @@ internal sealed class BadRequestExceptionMiddleware(ILogger logger, RequestDeleg
         {
             await _requestDelegate(httpContext);
         }
-        catch (BadRequestException ex)
+        catch (Exception ex) when (ex is BadRequestException || ex is ValidationException)
         {
+            if (ex is ValidationException vex)
+            {
+                string mensagemValidacao = string.Empty;
+                foreach (var item in vex.Errors)
+                    mensagemValidacao += vex.Message;
+
+                ex = new BadRequestException(mensagemValidacao);
+            }
+
             ex.CreateLog(_logger, EnumLogLevel.Warning, httpContext.Connection.RemoteIpAddress);
 
             httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
