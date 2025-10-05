@@ -17,11 +17,17 @@ internal sealed class BadRequestExceptionMiddleware(ILogger logger, RequestDeleg
         {
             await _requestDelegate(httpContext);
         }
-        catch (Exception ex) when (ex is BadRequestException || ex is ValidationException)
+        catch (ValidationException ex)
         {
-            if (ex is ValidationException vex)
-                ex = new BadRequestException(string.Join(",", vex.Errors.Select(x => x.ErrorMessage)));
-            
+            var vex = new ValidationException(string.Join(Environment.NewLine, ex.Errors.Select(x => x.ErrorMessage)));
+            vex.CreateLog(_logger, EnumLogLevel.Warning, httpContext.Connection.RemoteIpAddress);
+
+            httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+            await httpContext.Response.WriteAsync(string.Empty);
+        }
+        catch (BadRequestException ex)
+        {
             ex.CreateLog(_logger, EnumLogLevel.Warning, httpContext.Connection.RemoteIpAddress);
 
             httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;

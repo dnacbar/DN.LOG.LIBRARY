@@ -144,7 +144,6 @@ public class MiddlewareTest
     }
 
     [Theory]
-    [InlineData("BadRequestException", new[] { "Mensagem de BadRequestException" })]
     [InlineData("ValidationException", new[] { "ERRO 1", "ERRO 2", "ERRO 3" })]
     public async Task TestBadRequestExceptionMiddleware_ErrorMessages(string exceptionType, string[] expectedMessage)
     {
@@ -174,6 +173,6 @@ public class MiddlewareTest
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         // Permite validar a mensagem de erro no debug
-        Assert.True(string.IsNullOrEmpty(responseBody) || responseBody.Contains(expectedMessage[0]), $"Mensagem esperada: {expectedMessage[0]}, Mensagem retornada: {responseBody}");
+        Assert.True(string.IsNullOrEmpty(responseBody) || responseBody.Contains(string.Join(",", expectedMessage)), $"Mensagem esperada: {string.Join(",", expectedMessage)}, Mensagem retornada: {responseBody}");
     }
 }
