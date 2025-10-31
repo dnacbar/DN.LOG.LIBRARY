@@ -3,7 +3,7 @@ using DN.LOG.LIBRARY.MODEL.ENUM;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Net;
 
 namespace DN.LOG.LIBRARY.MIDDLEWARE;
