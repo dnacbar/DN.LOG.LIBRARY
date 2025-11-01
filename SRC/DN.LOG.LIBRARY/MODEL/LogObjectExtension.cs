@@ -4,7 +4,6 @@ using Elastic.Ingest.Elasticsearch;
 using Elastic.Ingest.Elasticsearch.DataStreams;
 using Elastic.Serilog.Sinks;
 using Elastic.Transport;
-using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using System.Net;
@@ -14,7 +13,7 @@ namespace DN.LOG.LIBRARY.MODEL;
 
 public static class LogObjectExtension
 {
-    public static void ConfigureSerilog()
+    public static void ConfigureSerilog(ElasticSearch elasticSearch)
     {
         var assemblyName = Assembly.GetEntryAssembly()?.GetName().Name?.ToLower().Replace(".", "-");
 
@@ -22,10 +21,11 @@ public static class LogObjectExtension
             .Enrich.WithMachineName()
             .Enrich.WithEnvironmentName()
             .Enrich.WithThreadId()
-            .Enrich.FromLogContext()
             .Enrich.WithProperty("Application", assemblyName)
+            .Enrich.FromLogContext()
+            .MinimumLevel.Information()
             .WriteTo.Console()
-            .WriteTo.Elasticsearch([new Uri("http://localhost:9200")], opts =>
+            .WriteTo.Elasticsearch([new Uri(elasticSearch.Uri)], opts =>
             {
                 opts.DataStream = new DataStreamName("LOG", "DN.LOG.LIBRARY", assemblyName);
                 opts.BootstrapMethod = BootstrapMethod.Failure;
@@ -33,6 +33,10 @@ public static class LogObjectExtension
                 {
                     channelOpts.BufferOptions = new BufferOptions();
                 };
+            }, transport =>
+            {
+                transport.Authentication(new BasicAuthentication(elasticSearch.Username, elasticSearch.Password));
+                transport.Authentication(new ApiKey(elasticSearch.ApiKey));
             })
             .CreateLogger();
     }
@@ -61,4 +65,12 @@ public static class LogObjectExtension
                 break;
         }
     }
+}
+
+public class ElasticSearch
+{
+    public string Uri { get; set; }
+    public string Username { get; set; }
+    public string Password { get; set; }
+    public string ApiKey { get; set; }
 }

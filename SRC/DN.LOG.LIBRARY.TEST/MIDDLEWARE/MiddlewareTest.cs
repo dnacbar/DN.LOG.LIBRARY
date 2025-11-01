@@ -144,7 +144,7 @@ public class MiddlewareTest
     }
 
     [Theory]
-    [InlineData("ValidationException", new[] { "ERRO 1", "ERRO 2", "ERRO 3" })]
+    [InlineData("BadRequestException", new[] { "ERRO 1", "ERRO 2", "ERRO 3" })]
     public async Task TestBadRequestExceptionMiddleware_ErrorMessages(string exceptionType, string[] expectedMessage)
     {
         using var host = await new HostBuilder()
