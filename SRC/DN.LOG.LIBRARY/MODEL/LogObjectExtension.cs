@@ -4,6 +4,7 @@ using Elastic.Ingest.Elasticsearch;
 using Elastic.Ingest.Elasticsearch.DataStreams;
 using Elastic.Serilog.Sinks;
 using Elastic.Transport;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using System.Net;
@@ -13,17 +14,17 @@ namespace DN.LOG.LIBRARY.MODEL;
 
 public static class LogObjectExtension
 {
-    public static void ConfigureSerilog(ElasticSearch elasticSearch)
+    public static void ConfigureSerilog(ElasticSearch elasticSearch, IConfiguration configuration)
     {
         var assemblyName = Assembly.GetEntryAssembly()?.GetName().Name?.ToLower().Replace(".", "-");
 
         Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(configuration)
             .Enrich.WithMachineName()
             .Enrich.WithEnvironmentName()
             .Enrich.WithThreadId()
             .Enrich.WithProperty("Application", assemblyName)
             .Enrich.FromLogContext()
-            .MinimumLevel.Information()
             .WriteTo.Console()
             .WriteTo.Elasticsearch([new Uri(elasticSearch.Uri)], opts =>
             {
@@ -35,8 +36,11 @@ public static class LogObjectExtension
                 };
             }, transport =>
             {
-                transport.Authentication(new BasicAuthentication(elasticSearch.Username, elasticSearch.Password));
-                transport.Authentication(new ApiKey(elasticSearch.ApiKey));
+                if (!string.IsNullOrEmpty(elasticSearch.Username))
+                    transport.Authentication(new BasicAuthentication(elasticSearch.Username, elasticSearch.Password));
+
+                if (!string.IsNullOrEmpty(elasticSearch.ApiKey))
+                    transport.Authentication(new ApiKey(elasticSearch.ApiKey));
             })
             .CreateLogger();
     }

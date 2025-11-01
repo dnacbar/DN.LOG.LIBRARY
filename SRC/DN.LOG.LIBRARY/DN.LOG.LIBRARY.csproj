@@ -6,7 +6,7 @@
 		<Nullable>disable</Nullable>
 		<Platforms>x64</Platforms>
 		<PackageId>DN.LOG.LIBRARY</PackageId>
-		<Version>1.5.8</Version>
+		<Version>1.5.9</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
